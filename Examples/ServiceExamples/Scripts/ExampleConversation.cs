@@ -54,8 +54,8 @@ public class ExampleConversation : MonoBehaviour
 
     private IEnumerator Examples()
     {
-        if (!_conversation.Message(OnMessage, _workspaceId, "hello"))
-            Log.Debug("ExampleConversation.Message()", "Failed to message!");
+        //if (!_conversation.Message(OnMessage, _workspaceId, "hello"))
+        //    Log.Debug("ExampleConversation.Message()", "Failed to message!");
 
         while (_waitingForResponse)
             yield return null;
@@ -103,8 +103,8 @@ public class ExampleConversation : MonoBehaviour
             context = _context
         };
 
-        if (!_conversation.Message(OnMessage, _workspaceId, messageRequest))
-            Log.Debug("ExampleConversation.AskQuestion()", "Failed to message!");
+        //if (!_conversation.Message(OnMessage, _workspaceId, messageRequest))
+        //    Log.Debug("ExampleConversation.AskQuestion()", "Failed to message!");
     }
 
     private void OnMessage(object resp, string data)

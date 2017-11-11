@@ -75,7 +75,7 @@ public class ExampleGetToken : MonoBehaviour
         Conversation conversation = new Conversation(credentials);
         conversation.VersionDate = _conversationVersionDate;
 
-        conversation.Message(OnMessage, _workspaceId, "hello");
+        //conversation.Message(OnMessage, _workspaceId, "hello");
     }
 
     private void OnMessage(object resp, string customData)

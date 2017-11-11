@@ -89,8 +89,8 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
             _conversation.VersionDate = _conversationVersionDate;
 
             //  Test initate with empty string
-            if (!_conversation.Message(OnMessage, _workspaceId, ""))
-                Log.Debug("TestConversation.RunTest()", "Failed to message!");
+            //if (!_conversation.Message(OnMessage, _workspaceId, ""))
+            //    Log.Debug("TestConversation.RunTest()", "Failed to message!");
 
             //  Test initiate with empty string message object
             MessageRequest messageRequest = new MessageRequest()
@@ -102,11 +102,11 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
                 context = _context
             };
 
-            if (!_conversation.Message(OnMessage, _workspaceId, messageRequest))
-                Log.Debug("TestConversation.RunTest()", "Failed to message!");
+            //if (!_conversation.Message(OnMessage, _workspaceId, messageRequest))
+            //    Log.Debug("TestConversation.RunTest()", "Failed to message!");
 
-            if (!_conversation.Message(OnMessage, _workspaceId, "hello"))
-                Log.Debug("TestConversation.RunTest()", "Failed to message!");
+            //if (!_conversation.Message(OnMessage, _workspaceId, "hello"))
+            //    Log.Debug("TestConversation.RunTest()", "Failed to message!");
 
             while (_waitingForResponse)
                 yield return null;
@@ -156,8 +156,8 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
                 context = _context
             };
 
-            if (!_conversation.Message(OnMessage, _workspaceId, messageRequest))
-                Log.Debug("TestConversation.AskQuestion()", "Failed to message!");
+            //if (!_conversation.Message(OnMessage, _workspaceId, messageRequest))
+            //    Log.Debug("TestConversation.AskQuestion()", "Failed to message!");
         }
 
         private void OnMessage(object resp, string data)

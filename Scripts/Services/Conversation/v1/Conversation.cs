@@ -106,6 +106,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// </summary>
         /// <param name="resp">The response object to a call to Message().</param>
         public delegate void OnMessage(object resp, string customData);
+        public delegate void OnMessageFail(string e);
 
         /// <summary>
         /// Message the specified workspaceId, input and callback.
@@ -114,10 +115,10 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// <param name="input">Input.</param>
         /// <param name="callback">Callback.</param>
         /// <param name="customData">Custom data.</param>
-        public bool Message(OnMessage callback, string workspaceID, string input, string customData = default(string))
+        public bool Message(OnMessage callback, OnMessageFail onMessageFail, string workspaceID, string input, string customData = default(string))
         {
-            if (string.IsNullOrEmpty(workspaceID))
-                throw new ArgumentNullException("workspaceId");
+            //if (string.IsNullOrEmpty(workspaceID))
+            //    throw new ArgumentNullException("workspaceId");
             if (callback == null)
                 throw new ArgumentNullException("callback");
 
@@ -137,6 +138,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
             req.Data = customData;
             req.Send = Encoding.UTF8.GetBytes(reqString);
             req.OnResponse = MessageResp;
+            req.OnMessageFail = onMessageFail;
 
             return connector.Send(req);
         }
@@ -149,7 +151,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// <param name="messageRequest">Message request object.</param>
         /// <param name="customData">Custom data.</param>
         /// <returns></returns>
-        public bool Message(OnMessage callback, string workspaceID, MessageRequest messageRequest, string customData = default(string))
+        public bool Message(OnMessage callback, OnMessageFail onMessageFail, string workspaceID, MessageRequest messageRequest, string customData = default(string))
         {
             if (string.IsNullOrEmpty(workspaceID))
                 throw new ArgumentNullException("workspaceId");
@@ -195,6 +197,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
             req.Data = customData;
             req.Send = Encoding.UTF8.GetBytes(stringToSend);
             req.OnResponse = MessageResp;
+            req.OnMessageFail = onMessageFail;
 
             return connector.Send(req);
         }
@@ -204,6 +207,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         {
             public OnMessage Callback { get; set; }
             public MessageRequest MessageRequest { get; set; }
+            public OnMessageFail OnMessageFail { get; set; }
             public string Data { get; set; }
         }
 
@@ -228,9 +232,17 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
                 }
             }
 
-            string customData = ((MessageReq)req).Data;
-            if (((MessageReq)req).Callback != null)
-                ((MessageReq)req).Callback(resp.Success ? dataObject : null, !string.IsNullOrEmpty(customData) ? customData : data.ToString());
+            if (resp.Success)
+            {
+                string customData = ((MessageReq)req).Data;
+                if (((MessageReq)req).Callback != null)
+                    ((MessageReq)req).Callback(resp.Success ? dataObject : null, !string.IsNullOrEmpty(customData) ? customData : data.ToString());
+            }
+            else
+            {
+                if (((MessageReq)req).OnMessageFail != null)
+                    ((MessageReq)req).OnMessageFail(resp.Error);
+            }
         }
         #endregion
 

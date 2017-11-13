@@ -15,8 +15,10 @@
 *
 */
 
+using IBM.Watson.DeveloperCloud.Connection;
 using IBM.Watson.DeveloperCloud.Logging;
 using IBM.Watson.DeveloperCloud.Services.Conversation.v1;
+using IBM.Watson.DeveloperCloud.Services.Discovery.v1;
 using IBM.Watson.DeveloperCloud.Utilities;
 using System;
 using System.Collections;
@@ -27,41 +29,38 @@ namespace IBM.Watson.DeveloperCloud.Examples
 {
     public class ExampleCatchError : MonoBehaviour
     {
-        private string _username;
-        private string _password;
-        private string _url;
+        private string _conversationUsername = "";
+        private string _conversationPassword = "";
+        private string _conversationUrl = "https://gateway.watsonplatform.net/conversation/api";
+        private string _workspaceId = "";
+
+        private string _discoveryUsername = "";
+        private string _discoveryPassword = "";
+        private string _discoveryUrl = "https://gateway.watsonplatform.net/discovery/api";
 
         void Start()
         {
             LogSystem.InstallDefaultReactors();
 
-            Credentials credentials = new Credentials(_username, _password, _url);
-            Conversation conversation = new Conversation(credentials);
+            Credentials conversationCredentials = new Credentials(_conversationUsername, _conversationPassword, _conversationUrl);
+            Conversation conversation = new Conversation(conversationCredentials);
             conversation.VersionDate = "2017-05-26";
+            conversation.Message(OnSuccess<object>, OnFail, _workspaceId, "");
 
-            try
-            {
-                if(!conversation.Message(OnMessage, OnMessageFail, null, ""))
-                    Log.Debug("ExampleCatchError.Start()", "Message failed!");
-            }
-            catch (ArgumentNullException e)
-            {
-                Log.Error("ExampleCatchError.Start()", "ArgumentNullException: {0}", e.Message);
-            }
-            catch (Exception e)
-            {
-                Log.Error("ExampleCatchError.Start()", "Exception: {0}", e.Message);
-            }
+            Credentials discoveryCredentials = new Credentials(_discoveryUsername, _discoveryPassword, _discoveryUrl);
+            Discovery discovery = new Discovery(discoveryCredentials);
+            discovery.VersionDate = "2016-12-01";
+            discovery.GetEnvironments(OnSuccess<GetEnvironmentsResponse>, OnFail);
         }
 
-        private void OnMessage(object resp, string customData)
+        private void OnSuccess<T>(T resp, string customData)
         {
-            Log.Debug("ExampleCatchError.OnMessage()", "Response received: {0}", customData);
+            Log.Debug("ExampleCatchError.OnSuccess()", "Response received: {0}", customData);
         }
 
-        private void OnMessageFail(string error)
+        private void OnFail(RESTConnector.Error error)
         {
-            Log.Error("ExampleCatchError.OnMessage()", "Error received: {0}", error);
+            Log.Error("ExampleCatchError.OnFail()", "Error received: {0}", error.ToString());
         }
     }
 }

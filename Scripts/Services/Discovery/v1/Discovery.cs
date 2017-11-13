@@ -113,12 +113,15 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
 
         #region Environments
         #region GetEnvironments
-        /// <summary>
-        /// The callback used by GetEnvironments().
-        /// </summary>
-        /// <param name="resp">The GetEnvironments response.</param>
-        /// <param name="customData">Optional data.</param>
-        public delegate void OnGetEnvironments(GetEnvironmentsResponse resp, string customData);
+        ///// <summary>
+        ///// The callback used by GetEnvironments().
+        ///// </summary>
+        ///// <param name="resp">The GetEnvironments response.</param>
+        ///// <param name="customData">Optional data.</param>
+        //public delegate void OnGetEnvironments(GetEnvironmentsResponse resp, string customData);
+
+        public delegate void SuccessCallback<T>(T response, string customData);
+        public delegate void FailCallback(RESTConnector.Error error);
 
         /// <summary>
         /// This class lists environments in a discovery instance. There are two environments returned: A read-only environment with the News
@@ -127,13 +130,16 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
         /// <param name="callback">The OnGetEnvironments callback.</param>
         /// <param name="customData">Optional custom data.</param>
         /// <returns>True if the call succeeds, false if the call is unsuccessful.</returns>
-        public bool GetEnvironments(OnGetEnvironments callback, string customData = default(string))
+        public bool GetEnvironments(SuccessCallback<GetEnvironmentsResponse> successCallback, FailCallback failCallback, string customData = default(string))
         {
-            if (callback == null)
-                throw new ArgumentNullException("callback");
+            if (successCallback == null)
+                throw new ArgumentNullException("successCallback");
+            if (failCallback == null)
+                throw new ArgumentNullException("failCallback");
 
             GetEnvironmentsRequest req = new GetEnvironmentsRequest();
-            req.Callback = callback;
+            req.SuccessCallback = successCallback;
+            req.FailCallback = failCallback;
             req.Data = customData;
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnGetEnvironmentsResponse;
@@ -148,7 +154,8 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
         private class GetEnvironmentsRequest : RESTConnector.Request
         {
             public string Data { get; set; }
-            public OnGetEnvironments Callback { get; set; }
+            public SuccessCallback<GetEnvironmentsResponse> SuccessCallback{ get; set; }
+            public FailCallback FailCallback { get; set; }
         }
 
         private void OnGetEnvironmentsResponse(RESTConnector.Request req, RESTConnector.Response resp)
@@ -177,10 +184,17 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
                 }
             }
 
-            string customData = ((GetEnvironmentsRequest)req).Data;
-            if (((GetEnvironmentsRequest)req).Callback != null)
-                ((GetEnvironmentsRequest)req).Callback(resp.Success ? environmentsData : null, !string.IsNullOrEmpty(customData) ? customData : data.ToString());
-
+            if (resp.Success)
+            {
+                string customData = ((GetEnvironmentsRequest)req).Data;
+                if (((GetEnvironmentsRequest)req).SuccessCallback != null)
+                    ((GetEnvironmentsRequest)req).SuccessCallback(resp.Success ? environmentsData : null, !string.IsNullOrEmpty(customData) ? customData : data.ToString());
+            }
+            else
+            {
+                if (((GetEnvironmentsRequest)req).FailCallback != null)
+                    ((GetEnvironmentsRequest)req).FailCallback(resp.Error);
+            }
         }
         #endregion
 

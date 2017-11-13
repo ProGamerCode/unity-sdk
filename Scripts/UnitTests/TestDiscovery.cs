@@ -126,8 +126,8 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
 
             //  Get Environments
             Log.Debug("TestDiscovery.RunTest()", "Attempting to get environments");
-            if (!_discovery.GetEnvironments(OnGetEnvironments))
-                Log.Debug("TestDiscovery.GetEnvironments()", "Failed to get environments");
+            //if (!_discovery.GetEnvironments(OnGetEnvironments))
+            //    Log.Debug("TestDiscovery.GetEnvironments()", "Failed to get environments");
             while (!_getEnvironmentsTested)
                 yield return null;
 

@@ -107,7 +107,8 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// <param name="resp">The response object to a call to Message().</param>
         public delegate void OnMessage(object resp, string customData);
         public delegate void OnMessageFail(string e);
-
+        public delegate void SuccessCallback<T>(T response, string customData);
+        public delegate void FailCallback(RESTConnector.Error error);
         /// <summary>
         /// Message the specified workspaceId, input and callback.
         /// </summary>
@@ -115,7 +116,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// <param name="input">Input.</param>
         /// <param name="callback">Callback.</param>
         /// <param name="customData">Custom data.</param>
-        public bool Message(OnMessage callback, OnMessageFail onMessageFail, string workspaceID, string input, string customData = default(string))
+        public bool Message(SuccessCallback<object> callback, FailCallback onMessageFail, string workspaceID, string input, string customData = default(string))
         {
             //if (string.IsNullOrEmpty(workspaceID))
             //    throw new ArgumentNullException("workspaceId");
@@ -151,7 +152,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// <param name="messageRequest">Message request object.</param>
         /// <param name="customData">Custom data.</param>
         /// <returns></returns>
-        public bool Message(OnMessage callback, OnMessageFail onMessageFail, string workspaceID, MessageRequest messageRequest, string customData = default(string))
+        public bool Message(SuccessCallback<object> callback, FailCallback onMessageFail, string workspaceID, MessageRequest messageRequest, string customData = default(string))
         {
             if (string.IsNullOrEmpty(workspaceID))
                 throw new ArgumentNullException("workspaceId");
@@ -205,9 +206,9 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
 
         private class MessageReq : RESTConnector.Request
         {
-            public OnMessage Callback { get; set; }
+            public SuccessCallback<object> Callback { get; set; }
             public MessageRequest MessageRequest { get; set; }
-            public OnMessageFail OnMessageFail { get; set; }
+            public FailCallback OnMessageFail { get; set; }
             public string Data { get; set; }
         }
 

@@ -84,6 +84,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         private Credentials _credentials = null;
         private string _url = "https://gateway.watsonplatform.net/conversation/api";
         private string _versionDate;
+        private fsSerializer _serializer = new fsSerializer();
         #endregion
 
         #region Constructor
@@ -125,7 +126,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// <param name="workspaceID">Workspace identifier.</param>
         /// <param name="input">Input.</param>
         /// <param name="customData">Custom data.</param>
-        public bool Message(SuccessCallback<object> successCallback, FailCallback failCallback, string workspaceID, string input, Dictionary<string, object> customData = null)
+        public bool Message(SuccessCallback<MessageResponse> successCallback, FailCallback failCallback, string workspaceID, string input, Dictionary<string, object> customData = null)
         {
             //if (string.IsNullOrEmpty(workspaceID))
             //    throw new ArgumentNullException("workspaceId");
@@ -138,21 +139,15 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
             if (connector == null)
                 return false;
 
-            string reqJson = "{{\"input\": {{\"text\": \"{0}\"}}}}";
-            string reqString = string.Format(reqJson, input);
+            MessageRequest messageRequest = new MessageRequest()
+            {
+                input = new InputData()
+                {
+                    text = input
+                }
+            };
 
-            MessageReq req = new MessageReq();
-            req.SuccessCallback = successCallback;
-            req.FailCallback = failCallback;
-            req.Headers["Content-Type"] = "application/json";
-            req.Headers["Accept"] = "application/json";
-            req.Parameters["version"] = VersionDate;
-            req.Function = "/" + workspaceID + "/message";
-            req.Send = Encoding.UTF8.GetBytes(reqString);
-            req.OnResponse = MessageResp;
-            req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
-
-            return connector.Send(req);
+            return Message(successCallback, failCallback, workspaceID, messageRequest, customData);
         }
 
         /// <summary>
@@ -164,7 +159,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// <param name="messageRequest">Message request object.</param>
         /// <param name="customData">Custom data.</param>
         /// <returns></returns>
-        public bool Message(SuccessCallback<object> successCallback, FailCallback failCallback, string workspaceID, MessageRequest messageRequest, Dictionary<string, object> customData = null)
+        public bool Message(SuccessCallback<MessageResponse> successCallback, FailCallback failCallback, string workspaceID, MessageRequest messageRequest, Dictionary<string, object> customData = null)
         {
             if (string.IsNullOrEmpty(workspaceID))
                 throw new ArgumentNullException("workspaceId");
@@ -176,31 +171,36 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
             RESTConnector connector = RESTConnector.GetConnector(Credentials, Workspaces);
             if (connector == null)
                 return false;
-            
-            IDictionary<string, string> requestDict = new Dictionary<string, string>();
-            if (messageRequest.context != null)
-                requestDict.Add("context", Json.Serialize(messageRequest.context));
-            if (messageRequest.input != null)
-                requestDict.Add("input", Json.Serialize(messageRequest.input));
-            requestDict.Add("alternate_intents", Json.Serialize(messageRequest.alternate_intents));
-            if (messageRequest.entities != null)
-                requestDict.Add("entities", Json.Serialize(messageRequest.entities));
-            if (messageRequest.intents != null)
-                requestDict.Add("intents", Json.Serialize(messageRequest.intents));
-            if (messageRequest.output != null)
-                requestDict.Add("output", Json.Serialize(messageRequest.output));
 
-            int iterator = 0;
-            StringBuilder stringBuilder = new StringBuilder("{");
-            foreach(KeyValuePair<string, string> property in requestDict)
-            {
-                string delimeter = iterator < requestDict.Count - 1 ? "," : "";
-                stringBuilder.Append(string.Format("\"{0}\": {1}{2}", property.Key, property.Value, delimeter));
-                iterator++;
-            }
-            stringBuilder.Append("}");
 
-            string stringToSend = stringBuilder.ToString();
+            //IDictionary<string, object> requestDict = new Dictionary<string, object>();
+            //if (messageRequest.context != null)
+            //    requestDict.Add("context", Json.Serialize(messageRequest.context as Dictionary<string, object>));
+            //if (messageRequest.input != null)
+            //    requestDict.Add("input", messageRequest.input);
+            //requestDict.Add("alternate_intents", Json.Serialize(messageRequest.alternate_intents));
+            //if (messageRequest.entities != null)
+            //    requestDict.Add("entities", Json.Serialize(messageRequest.entities as Dictionary<string, object>));
+            //if (messageRequest.intents != null)
+            //    requestDict.Add("intents", Json.Serialize(messageRequest.intents as Dictionary<string, object>));
+            //if (messageRequest.output != null)
+            //    requestDict.Add("output", Json.Serialize(messageRequest.output as Dictionary<string, object>));
+
+            //int iterator = 0;
+            //StringBuilder stringBuilder = new StringBuilder("{");
+            //foreach(KeyValuePair<string, object> property in requestDict)
+            //{
+            //    string delimeter = iterator < requestDict.Count - 1 ? "," : "";
+            //    stringBuilder.Append(string.Format("\"{0}\": {1}{2}", property.Key, property.Value, delimeter));
+            //    iterator++;
+            //}
+            //stringBuilder.Append("}");
+
+            //string stringToSend = stringBuilder.ToString();
+
+            fsData data;
+            _serializer.TrySerialize(messageRequest, out data).AssertSuccessWithoutWarnings();
+            string stringToSend = fsJsonPrinter.CompressedJson(data);
 
             MessageReq req = new MessageReq();
             req.SuccessCallback = successCallback;
@@ -222,7 +222,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
             /// <summary>
             /// The success callback.
             /// </summary>
-            public SuccessCallback<object> SuccessCallback { get; set; }
+            public SuccessCallback<MessageResponse> SuccessCallback { get; set; }
             /// <summary>
             /// The fail callback.
             /// </summary>
@@ -235,23 +235,35 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
 
         private void MessageResp(RESTConnector.Request req, RESTConnector.Response resp)
         {
-            object result = null;
-            string data = "";
+            Dictionary<string, object> resultDict = new Dictionary<string, object>();
+            MessageResponse result = new MessageResponse();
             Dictionary<string, object> customData = ((MessageReq)req).CustomData;
+            string data = "";
 
             if (resp.Success)
             {
                 try
                 {
-                    //  For deserializing into a generic object
                     data = Encoding.UTF8.GetString(resp.Data);
-                    result = Json.Deserialize(data);
+                    resultDict = Json.Deserialize(data) as Dictionary<string, object>;
+
+                    if (resultDict["input"] != null)
+                        result.input = resultDict["input"] as InputData;
+                    if (resultDict["intents"] != null)
+                        result.intents = resultDict["intents"] as Dictionary<string, object>;
+                    if (resultDict["entities"] != null)
+                        result.entities = resultDict["entities"] as Dictionary<string, object>;
+                    result.alternate_intents = (bool)resultDict["alternate_intents"];
+                    if (resultDict["context"] != null)
+                        result.context = resultDict["context"] as Dictionary<string, object>;
+                    if (resultDict["output"] != null)
+                        result.entities = resultDict["output"] as Dictionary<string, object>;
+
                     customData.Add("json", data);
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Conversation.MessageResp()", "MessageResp Exception: {0}", e.ToString());
-                    data = e.Message;
+                    Log.Error("Conversation.MessageResp()", "Exception: {0}", e.ToString());
                     resp.Success = false;
                 }
             }

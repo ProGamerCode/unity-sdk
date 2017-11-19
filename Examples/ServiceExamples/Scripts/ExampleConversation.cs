@@ -55,7 +55,7 @@ public class ExampleConversation : MonoBehaviour
 
     private IEnumerator Examples()
     {
-        if (!_conversation.Message(OnMessage, OnFail, _workspaceId, "hello"))
+        if (!_conversation.Message(OnSuccess, OnFail, _workspaceId, "hello"))
             Log.Debug("ExampleConversation.Message()", "Failed to message!");
 
         while (_waitingForResponse)
@@ -97,43 +97,43 @@ public class ExampleConversation : MonoBehaviour
     {
         MessageRequest messageRequest = new MessageRequest()
         {
-            input = new Dictionary<string, object>()
+            input = new InputData()
             {
-                { "text", _questionArray[_questionCount] }
+                text = _questionArray[_questionCount]
             },
             context = _context
         };
 
-        if (!_conversation.Message(OnMessage, OnFail, _workspaceId, messageRequest))
+        if (!_conversation.Message(OnSuccess, OnFail, _workspaceId, messageRequest))
             Log.Debug("ExampleConversation.AskQuestion()", "Failed to message!");
     }
 
-    private void OnMessage(object resp, Dictionary<string, object> customData)
+    private void OnSuccess(MessageResponse resp, Dictionary<string, object> customData)
     {
-        Log.Debug("ExampleConversation.OnMessage()", "Conversation: Message Response: {0}", customData["json"].ToString());
+        //Log.Debug("ExampleConversation.OnSuccess()", "Conversation: Message Response: {0}", customData["json"].ToString());
 
-        //  Convert resp to fsdata
-        fsData fsdata = null;
-        fsResult r = _serializer.TrySerialize(resp.GetType(), resp, out fsdata);
-        if (!r.Succeeded)
-            throw new WatsonException(r.FormattedMessages);
+        ////  Convert resp to fsdata
+        //fsData fsdata = null;
+        //fsResult r = _serializer.TrySerialize(resp.GetType(), resp, out fsdata);
+        //if (!r.Succeeded)
+        //    throw new WatsonException(r.FormattedMessages);
 
-        //  Convert fsdata to MessageResponse
-        MessageResponse messageResponse = new MessageResponse();
-        object obj = messageResponse;
-        r = _serializer.TryDeserialize(fsdata, obj.GetType(), ref obj);
-        if (!r.Succeeded)
-            throw new WatsonException(r.FormattedMessages);
+        ////  Convert fsdata to MessageResponse
+        //MessageResponse messageResponse = new MessageResponse();
+        //object obj = messageResponse;
+        //r = _serializer.TryDeserialize(fsdata, obj.GetType(), ref obj);
+        //if (!r.Succeeded)
+        //    throw new WatsonException(r.FormattedMessages);
 
-        //  Set context for next round of messaging
-        object _tempContext = null;
-        (resp as Dictionary<string, object>).TryGetValue("context", out _tempContext);
+        ////  Set context for next round of messaging
+        //object _tempContext = null;
+        //(resp as Dictionary<string, object>).TryGetValue("context", out _tempContext);
 
-        if (_tempContext != null)
-            _context = _tempContext as Dictionary<string, object>;
-        else
-            Log.Debug("ExampleConversation.OnMessage()", "Failed to get context");
-        _waitingForResponse = false;
+        //if (_tempContext != null)
+        //    _context = _tempContext as Dictionary<string, object>;
+        //else
+        //    Log.Debug("ExampleConversation.OnMessage()", "Failed to get context");
+        //_waitingForResponse = false;
     }
 
     private void OnFail(RESTConnector.Error error, Dictionary<string, object> customData)

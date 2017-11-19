@@ -40,7 +40,7 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
 
         private string[] _questionArray = { "can you turn up the AC", "can you turn on the wipers", "can you turn off the wipers", "can you turn down the ac", "can you unlock the door" };
         private fsSerializer _serializer = new fsSerializer();
-        private Dictionary<string, object> _context = null;
+        private object _context = null;
         private int _questionCount = -1;
         private bool _waitingForResponse = true;
 
@@ -89,22 +89,28 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
             _conversation = new Conversation(credentials);
             _conversation.VersionDate = _conversationVersionDate;
 
-            //  Test initate with empty string
-            if (!_conversation.Message(OnSuccess, OnFail, _workspaceId, ""))
-                Log.Debug("TestConversation.RunTest()", "Failed to message!");
+            ////  Test initate with empty string
+            //if (!_conversation.Message(OnSuccess, OnFail, _workspaceId, ""))
+            //    Log.Debug("TestConversation.RunTest()", "Failed to message!");
 
-            //  Test initiate with empty string message object
-            MessageRequest messageRequest = new MessageRequest()
-            {
-                input = new Dictionary<string, object>()
-            {
-                { "text", "" }
-            },
-                context = _context
-            };
+            //while (_waitingForResponse)
+            //    yield return null;
 
-            if (!_conversation.Message(OnSuccess, OnFail, _workspaceId, messageRequest))
-                Log.Debug("TestConversation.RunTest()", "Failed to message!");
+            ////  Test initiate with empty string message object
+            //MessageRequest messageRequest = new MessageRequest()
+            //{
+            //    input = new InputData()
+            //    {
+            //        text = ""
+            //    },
+            //    context = _context
+            //};
+
+            //if (!_conversation.Message(OnSuccess, OnFail, _workspaceId, messageRequest))
+            //    Log.Debug("TestConversation.RunTest()", "Failed to message!");
+
+            //while (_waitingForResponse)
+            //    yield return null;
 
             if (!_conversation.Message(OnSuccess, OnFail, _workspaceId, "hello"))
                 Log.Debug("TestConversation.RunTest()", "Failed to message!");
@@ -150,10 +156,10 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
         {
             MessageRequest messageRequest = new MessageRequest()
             {
-                input = new Dictionary<string, object>()
-            {
-                { "text", _questionArray[_questionCount] }
-            },
+                input = new InputData()
+                {
+                    text = _questionArray[_questionCount]
+                },
                 context = _context
             };
 
@@ -161,33 +167,33 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
                 Log.Debug("TestConversation.AskQuestion()", "Failed to message!");
         }
 
-        private void OnSuccess(object resp, Dictionary<string, object> customData)
+        private void OnSuccess(MessageResponse resp, Dictionary<string, object> customData)
         {
-            Log.Debug("TestConversation.OnMessage()", "Conversation: Message Response: {0}", customData["json"].ToString());
+            Log.Debug("TestConversation.OnSuccess()", "Conversation: Message Response: {0}", customData["json"].ToString());
 
-            //  Convert resp to fsdata
-            fsData fsdata = null;
-            fsResult r = _serializer.TrySerialize(resp.GetType(), resp, out fsdata);
-            if (!r.Succeeded)
-                throw new WatsonException(r.FormattedMessages);
+            ////  Convert resp to fsdata
+            //fsData fsdata = null;
+            //fsResult r = _serializer.TrySerialize(resp.GetType(), resp, out fsdata);
+            //if (!r.Succeeded)
+            //    throw new WatsonException(r.FormattedMessages);
 
-            //  Convert fsdata to MessageResponse
-            MessageResponse messageResponse = new MessageResponse();
-            object obj = messageResponse;
-            r = _serializer.TryDeserialize(fsdata, obj.GetType(), ref obj);
-            if (!r.Succeeded)
-                throw new WatsonException(r.FormattedMessages);
+            ////  Convert fsdata to MessageResponse
+            //MessageResponse messageResponse = new MessageResponse();
+            //object obj = messageResponse;
+            //r = _serializer.TryDeserialize(fsdata, obj.GetType(), ref obj);
+            //if (!r.Succeeded)
+            //    throw new WatsonException(r.FormattedMessages);
 
-            object _tempContext = null;
+            //object _tempContext = null;
             //  Set context for next round of messaging
-            (resp as Dictionary<string, object>).TryGetValue("context", out _tempContext);
+            //(resp as Dictionary<string, object>).TryGetValue("context", out _tempContext);
 
-            if (_tempContext != null)
-                _context = _tempContext as Dictionary<string, object>;
-            else
-                Log.Debug("TestConversation.OnMessage()", "Failed to get context");
-
-            Test(messageResponse != null);
+            //if (_tempContext != null)
+            //    _context = _tempContext as Dictionary<string, object>;
+            //else
+            //    Log.Debug("TestConversation.OnMessage()", "Failed to get context");
+            _context = resp.context;
+            Test(resp != null);
             _waitingForResponse = false;
         }
 

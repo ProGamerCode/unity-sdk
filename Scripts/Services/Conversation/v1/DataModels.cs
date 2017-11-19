@@ -30,99 +30,39 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// <summary>
         /// The input text.
         /// </summary>
-        public Dictionary<string, object> input { get; set; }
-        /// <summary>
-        /// State information for the conversation .
-        /// </summary>
-        public Dictionary<string, object> context { get; set; }
-        /// <summary>
-        /// Terms from the request that are identified as entities.
-        /// </summary>
-        public RuntimeEntity[] entities { get; set; }
+        public InputData input { get; set; }
         /// <summary>
         /// Terms from the request that are identified as intents.
         /// </summary>
-        public RuntimeIntent[] intents { get; set; }
+        public object intents { get; set; }
         /// <summary>
-        /// Output from the dialog, including the response to the user, the nodes that were triggered, and log messages.
+        /// Terms from the request that are identified as entities.
         /// </summary>
-        public OutputData output { get; set; }
+        public object entities { get; set; }
         /// <summary>
         /// Whether to return more than one intent. true indicates that all matching intents are returned. 
         /// </summary>
         public bool alternate_intents { get; set; }
+        /// <summary>
+        /// State information for the conversation .
+        /// </summary>
+        public object context { get; set; }
+        /// <summary>
+        /// Output from the dialog, including the response to the user, the nodes that were triggered, and log messages.
+        /// </summary>
+        public object output { get; set; }
     }
 
     /// <summary>
-    /// The entity object.
+    /// User input data object
     /// </summary>
     [fsObject]
-    public class RuntimeEntity
+    public class InputData
     {
         /// <summary>
-        /// The entity name.
+        /// The user's input.
         /// </summary>
-        public string entity { get; set; }
-        /// <summary>
-        /// The entity location.
-        /// </summary>
-        public int[] location { get; set; }
-        /// <summary>
-        /// The entity value.
-        /// </summary>
-        public string value { get; set; }
-    }
-
-    /// <summary>
-    /// The resultant intent.
-    /// </summary>
-    [fsObject]
-    public class RuntimeIntent
-    {
-        /// <summary>
-        /// The intent.
-        /// </summary>
-        public string intent { get; set; }
-        /// <summary>
-        /// The confidence.
-        /// </summary>
-        public float confidence { get; set; }
-    }
-
-    /// <summary>
-    /// The Output data.
-    /// </summary>
-    [fsObject]
-    public class OutputData
-    {
-        /// <summary>
-        /// Log messages.
-        /// </summary>
-        public RuntimeLogMessage[] log_messages { get; set; }
-        /// <summary>
-        /// Output text.
-        /// </summary>
-        public string[] text { get; set; }
-        /// <summary>
-        /// The nodes that were visited.
-        /// </summary>
-        public string[] nodes_visited { get; set; }
-    }
-
-    /// <summary>
-    /// The log message object.
-    /// </summary>
-    [fsObject]
-    public class RuntimeLogMessage
-    {
-        /// <summary>
-        /// The log level.
-        /// </summary>
-        public string level { get; set; }
-        /// <summary>
-        /// The log message.
-        /// </summary>
-        public string msg { get; set; }
+        public string text { get; set; }
     }
     #endregion
 
@@ -136,27 +76,27 @@ namespace IBM.Watson.DeveloperCloud.Services.Conversation.v1
         /// <summary>
         /// The input text.
         /// </summary>
-        public Dictionary<string, object> input { get; set; }
-        /// <summary>
-        /// State information for the conversation .
-        /// </summary>
-        public Dictionary<string, object> context { get; set; }
-        /// <summary>
-        /// Terms from the request that are identified as entities.
-        /// </summary>
-        public RuntimeEntity[] entities { get; set; }
-        /// <summary>
-        /// Terms from the request that are identified as intents.
-        /// </summary>
-        public RuntimeIntent[] intents { get; set; }
-        /// <summary>
-        /// Output from the dialog, including the response to the user, the nodes that were triggered, and log messages.
-        /// </summary>
-        public OutputData output { get; set; }
+        public InputData input { get; set; }
         /// <summary>
         /// Whether to return more than one intent. true indicates that all matching intents are returned. 
         /// </summary>
         public bool alternate_intents { get; set; }
+        /// <summary>
+        /// State information for the conversation .
+        /// </summary>
+        public object context { get; set; }
+        /// <summary>
+        /// Terms from the request that are identified as entities.
+        /// </summary>
+        public object entities { get; set; }
+        /// <summary>
+        /// Terms from the request that are identified as intents.
+        /// </summary>
+        public object intents { get; set; }
+        /// <summary>
+        /// Output from the dialog, including the response to the user, the nodes that were triggered, and log messages.
+        /// </summary>
+        public object output { get; set; }
     }
     #endregion
 }

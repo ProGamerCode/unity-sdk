@@ -1,26 +1,30 @@
-# Watson Developer Cloud Unity SDK
+# Watson APIs Unity SDK
 [![Build Status](https://travis-ci.org/watson-developer-cloud/unity-sdk.svg?branch=develop)](https://travis-ci.org/watson-developer-cloud/unity-sdk)
 
 Use this SDK to build Watson-powered applications in Unity.
 
-## Table of Contents
-* [Before you begin](#before-you-begin)
-* [Getting the Watson SDK and adding it to Unity](#getting-the-watson-sdk-and-adding-it-to-unity)
-  * [Installing the SDK source into your Unity project](#installing-the-sdk-source-into-your-unity-project)
-* [Configuring your service credentials](#configuring-your-service-credentials)
-* [Authentication](#authentication)
-* [Watson Services](#watson-services)
-* [Authentication Tokens](#authentication-tokens)
-* [Documentation](#documentation)
-* [Questions](#questions)
-* [Open Source @ IBM](#open-source--ibm)
-* [License](#license)
-* [Contributing](#contributing)
+<details>
+  <summary>Table of Contents</summary>
+
+  * [Before you begin](#before-you-begin)
+  * [Getting the Watson SDK and adding it to Unity](#getting-the-watson-sdk-and-adding-it-to-unity)
+    * [Installing the SDK source into your Unity project](#installing-the-sdk-source-into-your-unity-project)
+  * [Configuring your service credentials](#configuring-your-service-credentials)
+  * [Authentication](#authentication)
+  * [Watson Services](#watson-services)
+  * [Authentication Tokens](#authentication-tokens)
+  * [Documentation](#documentation)
+  * [Questions](#questions)
+  * [Open Source @ IBM](#open-source--ibm)
+  * [License](#license)
+  * [Contributing](#contributing)
+
+</details>
 
 ## Before you begin
 Ensure that you have the following prerequisites:
 
-* An IBM Bluemix account. If you don't have one, [sign up][bluemix_registration].
+* An IBM Cloud account. If you don't have one, [sign up][ibm_cloud_registration].
 * [Unity][get_unity]. You can use the **free** Personal edition.
 * Change the build settings in Unity (**File > Build Settings**) to any platform except for web player/Web GL. The Watson Developer Cloud Unity SDK does not support Unity Web Player.
 
@@ -33,16 +37,16 @@ Move the **`unity-sdk`** directory into the **`Assets`** directory of your Unity
 ## Configuring your service credentials
 To create instances of Watson services and their credentials, follow the steps below.
 
-**Note:** Service credentials are different from your Bluemix account username and password.
+**Note:** Service credentials are different from your IBM Cloud account username and password.
 
 1. Determine which services to configure.
 1. If you have configured the services already, complete the following steps. Otherwise, go to step 3.
-    1. Log in to Bluemix at https://bluemix.net.
+    1. Log in to IBM Cloud at https://console.bluemix.net.
     1. Click the service you would like to use.
     1. Click **Service credentials**.
     1. Click **View credentials** to access your credentials.
 1. If you need to configure the services that you want to use, complete the following steps.
-    1. Log in to Bluemix at https://bluemix.net.
+    1. Log in to IBM Cloud at https://console.bluemix.net.
     1. Click the **Create service** button.
     1. Under **Watson**, select which service you would like to create an instance of and click that service.
     1. Give the service and credential a name. Select a plan and click the **Create** button on the bottom.
@@ -56,32 +60,29 @@ The credentials for each service contain either a `username`, `password` and end
 
 ## Watson Services
 To get started with the Watson Services in Unity, click on each service below to read through each of their `README.md`'s and their codes.
-* [Alchemy Language](/Scripts/Services/AlchemyAPI/v1)
+* [Assistant](/Scripts/Services/Assistant/v1)
 * [Conversation](/Scripts/Services/Conversation/v1)
 * [Discovery](/Scripts/Services/Discovery/v1)
-* [Document Conversion](/Scripts/Services/DocumentConversion/v1) **Deprecated**
 * [Language Translator](/Scripts/Services/LanguageTranslator/v2)
 * [Natural Language Classifier](/Scripts/Services/NaturalLanguageClassifier/v2)
 * [Natural Language Understanding](/Scripts/Services/NaturalLanguageUnderstanding/v1)
 * [Personality Insights](/Scripts/Services/PersonalityInsights/v3)
-* [Retrieve and Rank](/Scripts/Services/RetrieveAndRank/v1) **Deprecated**
 * [Speech to Text](/Scripts/Services/SpeechToText/v1)
 * [Text to Speech](/Scripts/Services/TextToSpeech/v1)
 * [Tone Analyzer](/Scripts/Services/ToneAnalyzer/v3)
-* [Tradeoff Analytics](/Scripts/Services/TradeoffAnalytics/v1)
 * [Visual Recognition](/Scripts/Services/VisualRecognition/v3)
 
 ## Authentication
 Before you can use a service, it must be authenticated with the service instance's `username`, `password` and `url`.
 
 ```cs
-using IBM.Watson.DeveloperCloud.Services.Conversation.v1;
+using IBM.Watson.DeveloperCloud.Services.Assistant.v1;
 using IBM.Watson.DeveloperCloud.Utilities;
 
 void Start()
 {
     Credentials credentials = new Credentials(<username>, <password>, <url>);
-    Conversation _conversation = new Conversation(credentials);
+    Assistant _assistant = new Assistant(credentials);
 }
 ```
 
@@ -104,7 +105,7 @@ Success and failure callbacks are required. You can specify the return type in t
 private void Example()
 {
     //  Call with sepcific callbacks
-    conversation.Message(OnMessage, OnGetEnvironmentsFail, _workspaceId, "");
+    assistant.Message(OnMessage, OnGetEnvironmentsFail, _workspaceId, "");
     discovery.GetEnvironments(OnGetEnvironments, OnFail);
 }
 
@@ -138,7 +139,7 @@ Since the success callback signature is generic and the failure callback always 
 private void Example()
 {
     //  Call with generic callbacks
-    conversation.Message(OnSuccess, OnMessageFail, "<workspace-id>", "");
+    assistant.Message(OnSuccess, OnMessageFail, "<workspace-id>", "");
     discovery.GetEnvironments(OnSuccess, OnFail);
 }
 
@@ -163,7 +164,7 @@ void Example()
 {
     Dictionary<string, object> customData = new Dictionary<string, object>();
     customData.Add("foo", "bar");
-    conversation.Message(OnSuccess, OnFail, "<workspace-id>", "", customData);
+    assistant.Message(OnSuccess, OnFail, "<workspace-id>", "", customData);
 }
 
 //  Generic success callback
@@ -180,13 +181,54 @@ private void OnFail(RESTConnector.Error error, Dictionary<string, object> custom
 }
 ```
 
+## Custom Request Headers
+You can send custom request headers by adding them to the `customData` object.
+
+```cs
+void Example()
+{
+    //  Create customData object
+    Dictionary<string, object> customData = new Dictionary<string, object>();
+    //  Create a dictionary of custom headers
+    Dictionary<string, string> customHeaders = new Dictionary<string, string>();
+    //  Add to the header dictionary
+    customHeaders.Add("X-Watson-Metadata", "customer_id=some-assistant-customer-id");
+    //  Add the header dictionary to the custom data object
+    customData.Add(Constants.String.CUSTOM_REQUEST_HEADERS, customHeaders);
+
+    assistant.Message(OnSuccess, OnFail, "<workspace-id>", customData: customData);
+}
+```
+
+## Response Headers
+You can get responseheaders in the `customData` object in the callback.
+
+```cs
+void Example()
+{
+    assistant.Message(OnMessage, OnFail, "<workspace-id>");
+}
+
+private void OnMessage(object resp, Dictionary<string, object> customData)
+{
+    //  List all headers in the response headers object
+    if (customData.ContainsKey(Constants.String.RESPONSE_HEADERS))
+    {
+        foreach (KeyValuePair<string, string> kvp in customData[Constants.String.RESPONSE_HEADERS] as Dictionary<string, string>)
+        {
+            Log.Debug("ExampleCustomHeader.OnMessage()", "{0}: {1}", kvp.Key, kvp.Value);
+        }
+    }
+}
+```
+
 ## Authentication Tokens
 You use tokens to write applications that make authenticated requests to IBM Watson™ services without embedding service credentials in every call.
 
-You can write an authentication proxy in IBM® Bluemix® that obtains and returns a token to your client application, which can then use the token to call the service directly. This proxy eliminates the need to channel all service requests through an intermediate server-side application, which is otherwise necessary to avoid exposing your service credentials from your client application.
+You can write an authentication proxy in IBM Cloud that obtains and returns a token to your client application, which can then use the token to call the service directly. This proxy eliminates the need to channel all service requests through an intermediate server-side application, which is otherwise necessary to avoid exposing your service credentials from your client application.
 
 ```cs
-using IBM.Watson.DeveloperCloud.Services.Conversation.v1;
+using IBM.Watson.DeveloperCloud.Services.Assistant.v1;
 using IBM.Watson.DeveloperCloud.Utilities;
 
 void Start()
@@ -195,7 +237,7 @@ void Start()
     {
         AuthenticationToken = <authentication-token>
     };
-    Conversation _conversation = new Conversation(credentials);
+    Assistant _assistant = new Assistant(credentials);
 }
 ```
 
@@ -237,39 +279,9 @@ This library is licensed under Apache 2.0. Full license text is available in [LI
 ## Contributing
 See [CONTRIBUTING.md](.github/CONTRIBUTING.md).
 
-[wdc]: http://www.ibm.com/watson/developercloud/
+[wdc]: https://www.ibm.com/watson/developer/
 [wdc_unity_sdk]: https://github.com/watson-developer-cloud/unity-sdk
 [latest_release]: https://github.com/watson-developer-cloud/unity-sdk/releases/latest
-[bluemix_registration]: http://bluemix.net/registration
+[ibm_cloud_registration]: http://console.bluemix.net/registration
 [get_unity]: https://unity3d.com/get-unity
-
-[speech_to_text]: https://console.bluemix.net/docs/services/speech-to-text/index.html
-[text_to_speech]: https://console.bluemix.net/docs/services/text-to-speech/index.html
-[language_translator]: https://console.bluemix.net/docs/services/language-translator/index.html
-[dialog]: https://console.bluemix.net/docs/services/dialog/index.html
-[natural_language_classifier]: https://console.bluemix.net/docs/services/natural-language-classifier/natural-language-classifier-overview.html
-
-[alchemy_language]: http://www.alchemyapi.com/products/alchemylanguage
-[alchemyData_news]: http://www.ibm.com/watson/developercloud/alchemy-data-news.html
-[sentiment_analysis]: http://www.alchemyapi.com/products/alchemylanguage/sentiment-analysis
-[tone_analyzer]: https://console.bluemix.net/docs/services/tone-analyzer/index.html
-[tradeoff_analytics]: https://console.bluemix.net/docs/services/tradeoff-analytics/index.html
-[conversation]: https://console.bluemix.net/docs/services/conversation/index.html
-[visual_recognition]: https://console.bluemix.net/docs/services/visual-recognition/index.html
-[personality_insights]: https://console.bluemix.net/docs/services/personality-insights/index.html
-[conversation_tooling]: https://www.ibmwatsonconversation.com
-[retrieve_and_rank]: https://console.bluemix.net/docs/services/retrieve-and-rank/index.html
-[discovery]: https://console.bluemix.net/docs/services/discovery/index.html
-[document_conversion]: https://console.bluemix.net/docs/services/document-conversion/index.html
-[expressive_ssml]: https://console.bluemix.net/docs/services/text-to-speech/http.html#expressive
-[ssml]: https://console.bluemix.net/docs/services/text-to-speech/SSML.html
-[discovery-query]: https://console.bluemix.net/docs/services/discovery/using.html
-[natural_language_understanding]: https://www.ibm.com/watson/developercloud/natural-language-understanding.html
-[nlu_models]: https://console.bluemix.net/docs/services/natural-language-understanding/customizing.html
-[nlu_entities]: https://console.bluemix.net/docs/services/natural-language-understanding/entity-types.html
-[nlu_relations]: https://console.bluemix.net/docs/services/natural-language-understanding/relations.html
-
-[dialog_service]: https://console.bluemix.net/docs/services/dialog/index.html
-[dialog_migration]: https://console.bluemix.net/docs/services/conversation/index.html
-[conversation_service]: https://console.bluemix.net/docs/services/conversation/index.html
 [documentation]: https://watson-developer-cloud.github.io/unity-sdk/

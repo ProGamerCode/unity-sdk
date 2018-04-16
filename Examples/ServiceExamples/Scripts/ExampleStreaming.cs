@@ -26,10 +26,15 @@ using UnityEngine.UI;
 
 public class ExampleStreaming : MonoBehaviour
 {
-    private string _username = null;
-    private string _password = null;
-    private string _url = null;
-    
+    #region PLEASE SET THESE VARIABLES IN THE INSPECTOR
+    [SerializeField]
+    private string _username;
+    [SerializeField]
+    private string _password;
+    [SerializeField]
+    private string _url;
+    #endregion
+
     public Text ResultsField;
 
     private int _recordingRoutine = 0;
@@ -165,7 +170,7 @@ public class ExampleStreaming : MonoBehaviour
         yield break;
     }
 
-    private void OnRecognize(SpeechRecognitionEvent result)
+    private void OnRecognize(SpeechRecognitionEvent result, Dictionary<string, object> customData)
     {
         if (result != null && result.results.Length > 0)
         {
@@ -199,7 +204,7 @@ public class ExampleStreaming : MonoBehaviour
         }
     }
 
-    private void OnRecognizeSpeaker(SpeakerRecognitionEvent result)
+    private void OnRecognizeSpeaker(SpeakerRecognitionEvent result, Dictionary<string, object> customData)
     {
         if (result != null)
         {

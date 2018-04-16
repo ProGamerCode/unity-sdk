@@ -1,5 +1,37 @@
 Change Log
 ==========
+## Version 2.2.2
+* New: Send custom request headers and access response headers via `customData` object ([#4310](https://github.ibm.com/Watson/developer-experience/issues/4310), [#362](https://github.com/watson-developer-cloud/unity-sdk/pull/362)).
+* Fixed: Unresolved errors hidden by `#ifdef` ([#368](https://github.com/watson-developer-cloud/unity-sdk/issues/368), [#369](https://github.com/watson-developer-cloud/unity-sdk/pull/369))
+
+## Version 2.2.1
+_2018-04-12_
+* Fixed: Serialization/Deserialization of generic object in the `assistant` service([361](https://github.com/watson-developer-cloud/unity-sdk/issues/361), [363](https://github.com/watson-developer-cloud/unity-sdk/pull/363)).
+
+## Version 2.2.0
+_2018-04-09_
+* New: Updated Visual Recognition with Core ML support ([4182](https://zenhub.innovate.ibm.com/app/workspace/o/watson/developer-experience/issues/4182), [357](https://github.com/watson-developer-cloud/unity-sdk/pull/357)).
+* New: Abstract Classify Collections operation in Natural Language Classifier ([4223](https://github.ibm.com/Watson/developer-experience/issues/4223), [355](https://github.com/watson-developer-cloud/unity-sdk/pull/355))
+* Removed: Tradeoff Analytics ([352](https://github.com/watson-developer-cloud/unity-sdk/pull/352))
+* Removed: Retrieve and Rank ([352](https://github.com/watson-developer-cloud/unity-sdk/pull/352))
+* Removed: Document Conversion ([352](https://github.com/watson-developer-cloud/unity-sdk/pull/352))
+* Removed: Alchemy API ([350](https://github.com/watson-developer-cloud/unity-sdk/pull/350))
+* Fixed: Added `result_index` to Speech to Text response ([347](https://github.com/watson-developer-cloud/unity-sdk/issues/347), [349](https://github.com/watson-developer-cloud/unity-sdk/pull/349))
+* Enhanced: Made credentials, url and versionDates accessible in the inspector in all examples ([342](https://github.com/watson-developer-cloud/unity-sdk/issues/342), [351](https://github.com/watson-developer-cloud/unity-sdk/pull/351))
+* Fixed: Created new branch for asset store releases with better documentation ([341](https://github.com/watson-developer-cloud/unity-sdk/issues/341), [asset-store-release](https://github.com/watson-developer-cloud/unity-sdk/tree/asset-store-release)) and list of files to remove from an asset store release ([Wiki](https://github.com/watson-developer-cloud/unity-sdk/wiki/Asset-Store-Release))
+* Fixed: Platform specific compilation for Unity Web Request ([335](https://github.com/watson-developer-cloud/unity-sdk/issues/335), [346](https://github.com/watson-developer-cloud/unity-sdk/pull/346))
+* Fixed: Speech to Text - Do not send keywords if they are not provided ([336](https://github.com/watson-developer-cloud/unity-sdk/issues/336), [340](https://github.com/watson-developer-cloud/unity-sdk/pull/340)).
+
+## Version 2.1.0
+_2018-03-06_
+New: Abstract Watson Assistant service.
+New: External credentials in integration tests.
+New: Documentation on publishing a release.
+Fixed: Visual Recognition Classify method sends byte[] data in form data instead of body data.
+Fixed: Redirect Speech to Text streaming requests to TLS 1.0 streaming endpoint.
+Deprecated: Document Conversion - Please use Discovery.
+Removed: Language Translation - Please use Langauge Translator.
+
 ## Version 2.0.0
 _2017-11-20_ MAJOR RELEASE, BREAKING CHANGES
 * New: Implemented error callbacks in each call
@@ -78,7 +110,7 @@ _2016-08-26_
 * Deprecated: Retired `Dialog` service.
 * Fix: `ExampleLanguageTranslation` now is using `LanguageTranslator` before `LanguageTranslation` service goes live.
 * Fix: Abstracted custom voice model methods in `Text to Speech` service.
-* Fix: Error when pasting credentials from the new Bluemix site into the `Config Editor`.
+* Fix: Error when pasting credentials from the new IBM Cloud site into the `Config Editor`.
 * New: Added `CameraWidget` and `CameraDisplayWidget` to get video from device camera.
 * New: Added test scene for using the device camera with the `Visual Recognition` service.
 

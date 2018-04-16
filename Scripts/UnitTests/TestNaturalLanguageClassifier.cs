@@ -57,45 +57,48 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
         private string _classifierToDelete;
 #endif
         private bool _classifyTested = false;
+        private bool _classifyCollectionTested = false;
 
         public override IEnumerator RunTest()
         {
             LogSystem.InstallDefaultReactors();
 
-            try
+            VcapCredentials vcapCredentials = new VcapCredentials();
+            fsData data = null;
+
+            string result = null;
+
+            var vcapUrl = Environment.GetEnvironmentVariable("VCAP_URL");
+            var vcapUsername = Environment.GetEnvironmentVariable("VCAP_USERNAME");
+            var vcapPassword = Environment.GetEnvironmentVariable("VCAP_PASSWORD");
+
+            using (SimpleGet simpleGet = new SimpleGet(vcapUrl, vcapUsername, vcapPassword))
             {
-                VcapCredentials vcapCredentials = new VcapCredentials();
-                fsData data = null;
+                while (!simpleGet.IsComplete)
+                    yield return null;
 
-                //  Get credentials from a credential file defined in environmental variables in the VCAP_SERVICES format. 
-                //  See https://www.ibm.com/watson/developercloud/doc/common/getting-started-variables.html.
-                var environmentalVariable = Environment.GetEnvironmentVariable("VCAP_SERVICES");
-                var fileContent = File.ReadAllText(environmentalVariable);
-
-                //  Add in a parent object because Unity does not like to deserialize root level collection types.
-                fileContent = Utility.AddTopLevelObjectToJson(fileContent, "VCAP_SERVICES");
-
-                //  Convert json to fsResult
-                fsResult r = fsJsonParser.Parse(fileContent, out data);
-                if (!r.Succeeded)
-                    throw new WatsonException(r.FormattedMessages);
-
-                //  Convert fsResult to VcapCredentials
-                object obj = vcapCredentials;
-                r = _serializer.TryDeserialize(data, obj.GetType(), ref obj);
-                if (!r.Succeeded)
-                    throw new WatsonException(r.FormattedMessages);
-
-                //  Set credentials from imported credntials
-                Credential credential = vcapCredentials.VCAP_SERVICES["natural_language_classifier"][TestCredentialIndex].Credentials;
-                _username = credential.Username.ToString();
-                _password = credential.Password.ToString();
-                _url = credential.Url.ToString();
+                result = simpleGet.Result;
             }
-            catch
-            {
-                Log.Debug("TestNaturalLanguageClassifier.RunTest()", "Failed to get credentials from VCAP_SERVICES file. Please configure credentials to run this test. For more information, see: https://github.com/watson-developer-cloud/unity-sdk/#authentication");
-            }
+
+            //  Add in a parent object because Unity does not like to deserialize root level collection types.
+            result = Utility.AddTopLevelObjectToJson(result, "VCAP_SERVICES");
+
+            //  Convert json to fsResult
+            fsResult r = fsJsonParser.Parse(result, out data);
+            if (!r.Succeeded)
+                throw new WatsonException(r.FormattedMessages);
+
+            //  Convert fsResult to VcapCredentials
+            object obj = vcapCredentials;
+            r = _serializer.TryDeserialize(data, obj.GetType(), ref obj);
+            if (!r.Succeeded)
+                throw new WatsonException(r.FormattedMessages);
+
+            //  Set credentials from imported credntials
+            Credential credential = vcapCredentials.VCAP_SERVICES["natural_language_classifier"];
+            _username = credential.Username.ToString();
+            _password = credential.Password.ToString();
+            _url = credential.Url.ToString();
 
             //  Create credential and instantiate service
             Credentials credentials = new Credentials(_username, _password, _url);
@@ -110,13 +113,13 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
 
             //  Get classifiers
             if (!naturalLanguageClassifier.GetClassifiers(OnGetClassifiers, OnFail))
-                Log.Debug("ExampleNaturalLanguageClassifier.GetClassifiers()", "Failed to get classifiers!");
+                Log.Debug("TestNaturalLanguageClassifier.GetClassifiers()", "Failed to get classifiers!");
 
             while (!_getClassifiersTested)
                 yield return null;
 
             if (_classifierIds.Count == 0)
-                Log.Debug("ExampleNaturalLanguageClassifier.Examples()", "There are no trained classifiers. Please train a classifier...");
+                Log.Debug("TestNaturalLanguageClassifier.Examples()", "There are no trained classifiers. Please train a classifier...");
 
             if (_classifierIds.Count > 0)
             {
@@ -124,7 +127,7 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
                 foreach (string classifierId in _classifierIds)
                 {
                     if (!naturalLanguageClassifier.GetClassifier(OnGetClassifier, OnFail, classifierId))
-                        Log.Debug("ExampleNaturalLanguageClassifier.GetClassifier()", "Failed to get classifier {0}!", classifierId);
+                        Log.Debug("TestNaturalLanguageClassifier.GetClassifier()", "Failed to get classifier {0}!", classifierId);
                 }
 
                 while (!_getClassifierTested)
@@ -132,14 +135,14 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
             }
 
             if (!_areAnyClassifiersAvailable && _classifierIds.Count > 0)
-                Log.Debug("ExampleNaturalLanguageClassifier.Examples()", "All classifiers are training...");
+                Log.Debug("TestNaturalLanguageClassifier.Examples()", "All classifiers are training...");
 
             //  Train classifier
 #if TRAIN_CLASSIFIER
             string dataPath = Application.dataPath + "/Watson/Examples/ServiceExamples/TestData/weather_data_train.csv";
             var trainingContent = File.ReadAllText(dataPath);
             if (!naturalLanguageClassifier.TrainClassifier(OnTrainClassifier, OnFail, _classifierName + "/" + DateTime.Now.ToString(), "en", trainingContent))
-                Log.Debug("ExampleNaturalLanguageClassifier.TrainClassifier()", "Failed to train clasifier!");
+                Log.Debug("TestNaturalLanguageClassifier.TrainClassifier()", "Failed to train clasifier!");
 
             while (!_trainClassifierTested)
                 yield return null;
@@ -148,16 +151,41 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
 #if DELETE_TRAINED_CLASSIFIER
             if (!string.IsNullOrEmpty(_classifierToDelete))
                 if (!naturalLanguageClassifier.DeleteClassifer(OnDeleteTrainedClassifier, OnFail, _classifierToDelete))
-                    Log.Debug("ExampleNaturalLanguageClassifier.DeleteClassifer()", "Failed to delete clasifier {0}!", _classifierToDelete);
+                    Log.Debug("TestNaturalLanguageClassifier.DeleteClassifer()", "Failed to delete clasifier {0}!", _classifierToDelete);
 #endif
 
             //  Classify
             if (_areAnyClassifiersAvailable)
             {
                 if (!naturalLanguageClassifier.Classify(OnClassify, OnFail, _classifierId, _inputString))
-                    Log.Debug("ExampleNaturalLanguageClassifier.Classify()", "Failed to classify!");
+                    Log.Debug("TestNaturalLanguageClassifier.Classify()", "Failed to classify!");
 
                 while (!_classifyTested)
+                    yield return null;
+            }
+
+            //  Classify Collection
+            ClassifyCollectionInput classifyCollectionInput = new ClassifyCollectionInput()
+            {
+                collection = new List<ClassifyInput>()
+                {
+                    new ClassifyInput()
+                    {
+                        text = "Is it hot outside?"
+                    },
+                    new ClassifyInput()
+                    {
+                        text = "Is it going to rain?"
+                    }
+                }
+            };
+
+            if (_areAnyClassifiersAvailable)
+            {
+                if(!naturalLanguageClassifier.ClassifyCollection(OnClassifyCollection, OnFail, _classifierId, classifyCollectionInput))
+                    Log.Debug("TestNaturalLanguageClassifier.ClassifyCollection()", "Failed to classify!");
+
+                while (!_classifyCollectionTested)
                     yield return null;
             }
 
@@ -168,7 +196,7 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
 
         private void OnGetClassifiers(Classifiers classifiers, Dictionary<string, object> customData)
         {
-            Log.Debug("ExampleNaturalLanguageClassifier.OnGetClassifiers()", "Natural Language Classifier - GetClassifiers  Response: {0}", customData["json"].ToString());
+            Log.Debug("TestNaturalLanguageClassifier.OnGetClassifiers()", "Natural Language Classifier - GetClassifiers  Response: {0}", customData["json"].ToString());
 
             foreach (Classifier classifier in classifiers.classifiers)
                 _classifierIds.Add(classifier.classifier_id);
@@ -178,7 +206,7 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
 
         private void OnClassify(ClassifyResult result, Dictionary<string, object> customData)
         {
-            Log.Debug("ExampleNaturalLanguageClassifier.OnClassify()", "Natural Language Classifier - Classify Response: {0}", customData["json"].ToString());
+            Log.Debug("TestNaturalLanguageClassifier.OnClassify()", "Natural Language Classifier - Classify Response: {0}", customData["json"].ToString());
             Test(result != null);
             _classifyTested = true;
         }
@@ -186,7 +214,7 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
 #if TRAIN_CLASSIFIER
         private void OnTrainClassifier(Classifier classifier, Dictionary<string, object> customData)
         {
-            Log.Debug("ExampleNaturalLanguageClassifier.OnTrainClassifier()", "Natural Language Classifier - Train Classifier: {0}", customData["json"].ToString());
+            Log.Debug("TestNaturalLanguageClassifier.OnTrainClassifier()", "Natural Language Classifier - Train Classifier: {0}", customData["json"].ToString());
 #if DELETE_TRAINED_CLASSIFIER
             _classifierToDelete = classifier.classifier_id;
 #endif
@@ -197,7 +225,7 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
 
         private void OnGetClassifier(Classifier classifier, Dictionary<string, object> customData)
         {
-            Log.Debug("ExampleNaturalLanguageClassifier.OnGetClassifier()", "Natural Language Classifier - Get Classifier {0}: {1}", classifier.classifier_id, customData["json"].ToString());
+            Log.Debug("TestNaturalLanguageClassifier.OnGetClassifier()", "Natural Language Classifier - Get Classifier {0}: {1}", classifier.classifier_id, customData["json"].ToString());
             Test(classifier != null);
 
             //  Get any classifier that is available
@@ -214,14 +242,21 @@ namespace IBM.Watson.DeveloperCloud.UnitTests
 #if DELETE_TRAINED_CLASSIFIER
         private void OnDeleteTrainedClassifier(bool success, Dictionary<string, object> customData)
         {
-            Log.Debug("ExampleNaturalLanguageClassifier.OnDeleteTrainedClassifier()", "Natural Language Classifier - Delete Trained Classifier {0} | response: {1}", _classifierToDelete, customData["json"].ToString());
+            Log.Debug("TestNaturalLanguageClassifier.OnDeleteTrainedClassifier()", "Natural Language Classifier - Delete Trained Classifier {0} | response: {1}", _classifierToDelete, customData["json"].ToString());
             Test(success);
         }
 #endif
 
+        private void OnClassifyCollection(ClassificationCollection result, Dictionary<string, object> customData)
+        {
+            Log.Debug("TestNaturalLanguageClassifier.OnClassifyCollection()", "Natural Language Classifier - Classify Collection Response: {0}", customData["json"].ToString());
+            Test(result != null);
+            _classifyCollectionTested = true;
+        }
+
         private void OnFail(RESTConnector.Error error, Dictionary<string, object> customData)
         {
-            Log.Error("ExampleAlchemyLanguage.OnFail()", "Error received: {0}", error.ToString());
+            Log.Error("TestNaturalLanguageClassifier.OnFail()", "Error received: {0}", error.ToString());
         }
     }
 }

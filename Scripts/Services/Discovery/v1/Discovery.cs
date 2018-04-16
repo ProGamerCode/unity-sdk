@@ -29,7 +29,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
 {
     /// <summary>
     /// This class wraps the Discovery service
-    /// <a href="http://www.ibm.com/watson/developercloud/discovery.html">Discovery Service</a>
+    /// <a href="https://www.ibm.com/watson/services/discovery/">Discovery Service</a>
     /// </summary>
     public class Discovery : IWatsonService
     {
@@ -150,6 +150,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnGetEnvironmentsResponse;
 
@@ -181,6 +188,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             GetEnvironmentsResponse result = new GetEnvironmentsResponse();
             fsData data = null;
             Dictionary<string, object> customData = ((GetEnvironmentsRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -226,7 +234,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
         /// <param name="failCallback">The fail callback.</param>
         /// <param name="name">The name of the environment to be created.</param>
         /// <param name="description">The description of the environment to be created.</param>
-        /// <param name="size">The size of the environment to be created. See <a href="http://www.ibm.com/watson/developercloud/discovery.html#pricing-block">pricing.</a></param>
+        /// <param name="size">The size of the environment to be created. See <a href="https://www.ibm.com/watson/services/discovery/#pricing-block">pricing.</a></param>
         /// <param name="customData">Optional custom data.</param>
         /// <returns>True if the call succeeds, false if the call is unsuccessful.</returns>
         public bool AddEnvironment(SuccessCallback<Environment> successCallback, FailCallback failCallback, string name = default(string), string description = default(string), int size = 0, Dictionary<string, object> customData = null)
@@ -264,6 +272,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnAddEnvironmentResponse;
             req.Headers["Content-Type"] = "application/json";
@@ -299,6 +314,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             Environment result = new Environment();
             fsData data = null;
             Dictionary<string, object> customData = ((AddEnvironmentRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -357,6 +373,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnGetEnvironmentResponse;
 
@@ -388,6 +411,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             Environment result = new Environment();
             fsData data = null;
             Dictionary<string, object> customData = ((GetEnvironmentRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -446,6 +470,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnDeleteEnvironmentResponse;
             req.Delete = true;
@@ -478,6 +509,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             DeleteEnvironmentResponse result = new DeleteEnvironmentResponse();
             fsData data = null;
             Dictionary<string, object> customData = ((DeleteEnvironmentRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -537,6 +569,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             if (!string.IsNullOrEmpty(name))
             {
@@ -572,6 +611,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             GetConfigurationsResponse result = new GetConfigurationsResponse();
             fsData data = null;
             Dictionary<string, object> customData = ((GetConfigurationsRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -667,6 +707,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnAddConfigurationResponse;
             req.Headers["Content-Type"] = "application/json";
@@ -701,6 +748,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             Configuration result = new Configuration();
             fsData data = null;
             Dictionary<string, object> customData = ((AddConfigurationRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -762,6 +810,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnGetConfigurationResponse;
 
@@ -793,6 +848,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             Configuration result = new Configuration();
             fsData data = null;
             Dictionary<string, object> customData = ((GetConfigurationRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -854,6 +910,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnDeleteConfigurationResponse;
             req.Delete = true;
@@ -886,6 +949,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             DeleteConfigurationResponse result = new DeleteConfigurationResponse();
             fsData data = null;
             Dictionary<string, object> customData = ((DeleteConfigurationRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -1015,6 +1079,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnPreviewConfigurationResponse;
 
@@ -1070,6 +1141,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             TestDocument result = new TestDocument();
             fsData data = null;
             Dictionary<string, object> customData = ((PreviewConfigurationRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -1130,6 +1202,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             if (!string.IsNullOrEmpty(name))
             {
@@ -1165,6 +1244,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             GetCollectionsResponse result = new GetCollectionsResponse();
             fsData data = null;
             Dictionary<string, object> customData = ((GetCollectionsRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -1256,6 +1336,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnAddCollectionResponse;
             req.Headers["Content-Type"] = "application/json";
@@ -1290,6 +1377,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             CollectionRef result = new CollectionRef();
             fsData data = null;
             Dictionary<string, object> customData = ((AddCollectionRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -1351,6 +1439,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnGetCollectionResponse;
 
@@ -1382,6 +1477,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             Collection result = new Collection();
             fsData data = null;
             Dictionary<string, object> customData = ((GetCollectionRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -1443,6 +1539,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnDeleteCollectionResponse;
             req.Delete = true;
@@ -1475,6 +1578,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             DeleteCollectionResponse result = new DeleteCollectionResponse();
             fsData data = null;
             Dictionary<string, object> customData = ((DeleteCollectionRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -1536,6 +1640,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnGetFieldsResponse;
 
@@ -1567,6 +1678,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             GetFieldsResponse result = new GetFieldsResponse();
             fsData data = null;
             Dictionary<string, object> customData = ((GetFieldsRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -1801,6 +1913,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnAddDocumentResponse;
 
@@ -1844,6 +1963,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             DocumentAccepted result = new DocumentAccepted();
             fsData data = null;
             Dictionary<string, object> customData = ((AddDocumentRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -1908,6 +2028,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnDeleteDocumentResponse;
             req.Delete = true;
@@ -1940,6 +2067,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             DeleteDocumentResponse result = new DeleteDocumentResponse();
             fsData data = null;
             Dictionary<string, object> customData = ((DeleteDocumentRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -2004,6 +2132,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnGetDocumentResponse;
 
@@ -2035,6 +2170,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             DocumentStatus result = new DocumentStatus();
             fsData data = null;
             Dictionary<string, object> customData = ((GetDocumentRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -2263,6 +2399,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
             req.Parameters["version"] = VersionDate;
             req.OnResponse = OnUpdateDocumentResponse;
 
@@ -2306,6 +2449,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             DocumentAccepted result = new DocumentAccepted();
             fsData data = null;
             Dictionary<string, object> customData = ((UpdateDocumentRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {
@@ -2382,6 +2526,13 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             req.SuccessCallback = successCallback;
             req.FailCallback = failCallback;
             req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
+            if(req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
+            {
+                foreach(KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
+                {
+                    req.Headers.Add(kvp.Key, kvp.Value);
+                }
+            }
 
             if (!string.IsNullOrEmpty(filter))
                 req.Parameters["filter"] = filter;
@@ -2428,6 +2579,7 @@ namespace IBM.Watson.DeveloperCloud.Services.Discovery.v1
             QueryResponse result = new QueryResponse();
             fsData data = null;
             Dictionary<string, object> customData = ((QueryRequest)req).CustomData;
+            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
 
             if (resp.Success)
             {

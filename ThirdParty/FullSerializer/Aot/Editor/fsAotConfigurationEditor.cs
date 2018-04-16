@@ -12,11 +12,20 @@ namespace FullSerializer {
 	[InitializeOnLoad]
 	public static class PlayStateNotifier {
 		static PlayStateNotifier() {
+#if UNITY_2017_2_OR_NEWER
+            EditorApplication.playModeStateChanged += ModeChanged;
+#else
 			EditorApplication.playmodeStateChanged += ModeChanged;
-		}
+#endif
+        }
 
+#if UNITY_2017_2_OR_NEWER
+        private static void ModeChanged(PlayModeStateChange playModeStateChange)
+        {
+#else
 		private static void ModeChanged () {
-			if (!EditorApplication.isPlayingOrWillChangePlaymode && EditorApplication.isPlaying) {
+#endif
+            if (!EditorApplication.isPlayingOrWillChangePlaymode && EditorApplication.isPlaying) {
 				Debug.Log("There are " + fsAotCompilationManager.AotCandidateTypes.Count + " candidate types");
 				foreach (fsAotConfiguration target in Resources.FindObjectsOfTypeAll<fsAotConfiguration>()) {
 					var seen = new HashSet<string>(target.aotTypes.Select(t => t.FullTypeName));

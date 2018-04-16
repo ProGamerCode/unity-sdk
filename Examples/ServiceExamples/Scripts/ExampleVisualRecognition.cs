@@ -15,9 +15,9 @@
 *
 */
 //  Uncomment to train a new classifier
-#define TRAIN_CLASSIFIER
+//#define TRAIN_CLASSIFIER
 //  Uncommnent to delete the trained classifier
-#define DELETE_TRAINED_CLASSIFIER
+//#define DELETE_TRAINED_CLASSIFIER
 
 using UnityEngine;
 using System.Collections;
@@ -29,15 +29,20 @@ using IBM.Watson.DeveloperCloud.Connection;
 
 public class ExampleVisualRecognition : MonoBehaviour
 {
-    private string _apikey = null;
-    private string _url = null;
+    #region PLEASE SET THESE VARIABLES IN THE INSPECTOR
+    [SerializeField]
+    private string _apikey;
+    [SerializeField]
+    private string _url;
+    [SerializeField]
+    private string _versionDate;
+    #endregion
 
     private VisualRecognition _visualRecognition;
-    private string _visualRecognitionVersionDate = "2016-05-20";
 
     private string _classifierID = "";
     private string _imageURL = "https://upload.wikimedia.org/wikipedia/commons/e/e9/Official_portrait_of_Barack_Obama.jpg";
-    //private string _imageTextURL = "http://i.stack.imgur.com/ZS6nH.png";
+    private string _coreMLDownloadPath = "";
 
 #if DELETE_TRAINED_CLASSIFIER
     private string _classifierToDelete;
@@ -55,6 +60,7 @@ public class ExampleVisualRecognition : MonoBehaviour
     private bool _classifyPostTested = false;
     private bool _detectFacesGetTested = false;
     private bool _detectFacesPostTested = false;
+    private bool _getCoreMLModelTested = false;
 
     void Start()
     {
@@ -64,7 +70,7 @@ public class ExampleVisualRecognition : MonoBehaviour
         Credentials credentials = new Credentials(_apikey, _url);
 
         _visualRecognition = new VisualRecognition(credentials);
-        _visualRecognition.VersionDate = _visualRecognitionVersionDate;
+        _visualRecognition.VersionDate = _versionDate;
 
         Runnable.Run(Examples());
     }
@@ -73,32 +79,32 @@ public class ExampleVisualRecognition : MonoBehaviour
     {
         //          Get all classifiers
         Log.Debug("ExampleVisualRecognition.Examples()", "Attempting to get all classifiers");
-        if (!_visualRecognition.GetClassifiers(OnGetClassifiers, OnFail))
+        if (!_visualRecognition.GetClassifiersBrief(OnGetClassifiers, OnFail))
             Log.Debug("ExampleVisualRecognition.GetClassifiers()", "Failed to get all classifiers!");
 
         while (!_getClassifiersTested)
             yield return null;
 
 #if TRAIN_CLASSIFIER
-        //          Train classifier
-        Log.Debug("ExampleVisualRecognition.Examples()", "Attempting to train classifier");
-        string positiveExamplesPath = Application.dataPath + "/Watson/Examples/ServiceExamples/TestData/visual-recognition-classifiers/giraffe_positive_examples.zip";
-        string negativeExamplesPath = Application.dataPath + "/Watson/Examples/ServiceExamples/TestData/visual-recognition-classifiers/negative_examples.zip";
-        Dictionary<string, string> positiveExamples = new Dictionary<string, string>();
-        positiveExamples.Add("giraffe", positiveExamplesPath);
-        if (!_visualRecognition.TrainClassifier(OnTrainClassifier, OnFail, "unity-test-classifier-example", positiveExamples, negativeExamplesPath))
-            Log.Debug("ExampleVisualRecognition.TrainClassifier()", "Failed to train classifier!");
+                //          Train classifier
+                Log.Debug("ExampleVisualRecognition.Examples()", "Attempting to train classifier");
+                string positiveExamplesPath = Application.dataPath + "/Watson/Examples/ServiceExamples/TestData/visual-recognition-classifiers/giraffe_positive_examples.zip";
+                string negativeExamplesPath = Application.dataPath + "/Watson/Examples/ServiceExamples/TestData/visual-recognition-classifiers/negative_examples.zip";
+                Dictionary<string, string> positiveExamples = new Dictionary<string, string>();
+                positiveExamples.Add("giraffe", positiveExamplesPath);
+                if (!_visualRecognition.TrainClassifier(OnTrainClassifier, OnFail, "unity-test-classifier-example", positiveExamples, negativeExamplesPath))
+                    Log.Debug("ExampleVisualRecognition.TrainClassifier()", "Failed to train classifier!");
 
-        while (!_trainClassifierTested)
-            yield return null;
+                while (!_trainClassifierTested)
+                    yield return null;
 
-        //          Find classifier by ID
-        Log.Debug("ExampleVisualRecognition.Examples()", "Attempting to find classifier by ID");
-        if (!_visualRecognition.GetClassifier(OnGetClassifier, OnFail, _classifierID))
-            Log.Debug("ExampleVisualRecognition.GetClassifier()", "Failed to get classifier!");
+                //          Find classifier by ID
+                Log.Debug("ExampleVisualRecognition.Examples()", "Attempting to find classifier by ID");
+                if (!_visualRecognition.GetClassifier(OnGetClassifier, OnFail, _classifierID))
+                    Log.Debug("ExampleVisualRecognition.GetClassifier()", "Failed to get classifier!");
 
-        while (!_getClassifierTested)
-            yield return null;
+                while (!_getClassifierTested)
+                    yield return null;
 #endif
 
         //          Classify get
@@ -136,38 +142,44 @@ public class ExampleVisualRecognition : MonoBehaviour
 
         while (!_detectFacesPostTested)
             yield return null;
-        
+
 #if DELETE_TRAINED_CLASSIFIER
         #region Delay
-        Runnable.Run(Delay(_delayTime));
-        while (_isWaitingForDelay)
-            yield return null;
+                Runnable.Run(Delay(_delayTime));
+                while (_isWaitingForDelay)
+                    yield return null;
         #endregion
 
-        //          Delete classifier by ID
-        Log.Debug("ExampleVisualRecognition.Examples()", "Attempting to delete classifier");
-        if (!_visualRecognition.DeleteClassifier(OnDeleteClassifier, OnFail, _classifierToDelete))
-            Log.Debug("ExampleVisualRecognition.DeleteClassifier()", "Failed to delete classifier!");
+                //          Delete classifier by ID
+                Log.Debug("ExampleVisualRecognition.Examples()", "Attempting to delete classifier");
+                if (!_visualRecognition.DeleteClassifier(OnDeleteClassifier, OnFail, _classifierToDelete))
+                    Log.Debug("ExampleVisualRecognition.DeleteClassifier()", "Failed to delete classifier!");
 
-        while (!_deleteClassifierTested)
-            yield return null;
+                while (!_deleteClassifierTested)
+                    yield return null;
 #endif
+
+        _visualRecognition.DownloadCoreMLModel(_classifierID, _coreMLDownloadPath);
+        while (!_getCoreMLModelTested)
+            yield return null;
 
         Log.Debug("ExampleVisualRecognition.Examples()", "Visual Recogition tests complete");
     }
 
-    private void OnGetClassifiers(GetClassifiersTopLevelBrief classifiers, Dictionary<string, object> customData)
-    {
-        Log.Debug("ExampleVisualRecognition.OnGetClassifiers()", "VisualRecognition - GetClassifiers Response: {0}", customData["json"].ToString());
+private void OnGetClassifiers(ClassifiersBrief classifiers, Dictionary<string, object> customData)
+{
+    Log.Debug("ExampleVisualRecognition.OnGetClassifiers()", "VisualRecognition - GetClassifiers Response: {0}", customData["json"].ToString());
 
-        _getClassifiersTested = true;
-    }
+    _getClassifiersTested = true;
+}
 
-    private void OnGetClassifier(GetClassifiersPerClassifierVerbose classifier, Dictionary<string, object> customData)
+#if DELETE_TRAINED_CLASSIFIER
+    private void OnGetClassifier(ClassifierVerbose classifier, Dictionary<string, object> customData)
     {
         Log.Debug("ExampleVisualRecognition.OnGetClassifier()", "VisualRecognition - GetClassifier Response: {0}", customData["json"].ToString());
         _getClassifierTested = true;
     }
+#endif
 
 #if DELETE_TRAINED_CLASSIFIER
     private void OnDeleteClassifier(bool success, Dictionary<string, object> customData)
@@ -178,7 +190,7 @@ public class ExampleVisualRecognition : MonoBehaviour
 #endif
 
 #if TRAIN_CLASSIFIER
-    private void OnTrainClassifier(GetClassifiersPerClassifierVerbose classifier, Dictionary<string, object> customData)
+    private void OnTrainClassifier(ClassifierVerbose classifier, Dictionary<string, object> customData)
     {
         Log.Debug("ExampleVisualRecognition.OnTrainClassifier()", "{0}", customData["json"].ToString());
 
@@ -190,36 +202,38 @@ public class ExampleVisualRecognition : MonoBehaviour
     }
 #endif
 
-    private void OnClassifyGet(ClassifyTopLevelMultiple classify, Dictionary<string, object> customData)
-    {
-        Log.Debug("ExampleVisualRecognition.OnClassifyGet()", "{0}", customData["json"].ToString());
-        _classifyGetTested = true;
+private void OnClassifyGet(ClassifiedImages classify, Dictionary<string, object> customData)
+{
+    Log.Debug("ExampleVisualRecognition.OnClassifyGet()", "{0}", customData["json"].ToString());
+    _classifyGetTested = true;
 
-    }
+}
 
-    private void OnClassifyPost(ClassifyTopLevelMultiple classify, Dictionary<string, object> customData)
-    {
-        Log.Debug("ExampleVisualRecognition.OnClassifyPost()", "{0}", customData["json"].ToString());
-        _classifyPostTested = true;
-    }
+private void OnClassifyPost(ClassifiedImages classify, Dictionary<string, object> customData)
+{
+    Log.Debug("ExampleVisualRecognition.OnClassifyPost()", "{0}", customData["json"].ToString());
+    _classifyPostTested = true;
+}
 
-    private void OnDetectFacesGet(FacesTopLevelMultiple multipleImages, Dictionary<string, object> customData)
-    {
-        Log.Debug("ExampleVisualRecognition.OnDetectFacesGet()", "{0}", customData["json"].ToString());
-        _detectFacesGetTested = true;
-    }
+private void OnDetectFacesGet(DetectedFaces multipleImages, Dictionary<string, object> customData)
+{
+    Log.Debug("ExampleVisualRecognition.OnDetectFacesGet()", "{0}", customData["json"].ToString());
+    _detectFacesGetTested = true;
+}
 
-    private void OnDetectFacesPost(FacesTopLevelMultiple multipleImages, Dictionary<string, object> customData)
-    {
-        Log.Debug("ExampleVisualRecognition.OnDetectFacesPost()", "{0}", customData["json"].ToString());
-        _detectFacesPostTested = true;
-    }
+private void OnDetectFacesPost(DetectedFaces multipleImages, Dictionary<string, object> customData)
+{
+    Log.Debug("ExampleVisualRecognition.OnDetectFacesPost()", "{0}", customData["json"].ToString());
+    _detectFacesPostTested = true;
+}
 
-    #region Delay
-    //  Introducing a delay because of a known issue with Visual Recognition where newly created classifiers 
-    //  will disappear without being deleted if a delete is attempted less than ~10 seconds after creation.
+#region Delay
+//  Introducing a delay because of a known issue with Visual Recognition where newly created classifiers 
+//  will disappear without being deleted if a delete is attempted less than ~10 seconds after creation.
+#if DELETE_TRAINED_CLASSIFIER
     private float _delayTime = 15f;
     private bool _isWaitingForDelay = false;
+
 
     private IEnumerator Delay(float delayTime)
     {
@@ -228,10 +242,11 @@ public class ExampleVisualRecognition : MonoBehaviour
         yield return new WaitForSeconds(delayTime);
         _isWaitingForDelay = false;
     }
-    #endregion
+#endif
+#endregion
 
-    private void OnFail(RESTConnector.Error error, Dictionary<string, object> customData)
-    {
-        Log.Error("ExampleRetrieveAndRank.OnFail()", "Error received: {0}", error.ToString());
-    }
+private void OnFail(RESTConnector.Error error, Dictionary<string, object> customData)
+{
+    Log.Error("ExampleRetrieveAndRank.OnFail()", "Error received: {0}", error.ToString());
+}
 }
